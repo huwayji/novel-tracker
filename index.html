@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novel Tracker Pro - Advanced Reading Progress Tracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.44.0/tabler-icons.min.css">
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            
+            --bg-primary: white;
+            --bg-secondary: #f9fafb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #1f2937;
+            --bg-secondary: #111827;
+            --text-primary: #f9fafb;
+            --text-secondary: #d1d5db;
+            --border-color: #374151;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            transition: background 0.3s;
+        }
+
+        [data-theme="dark"] body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%);
+        }
+
+        #root {
+            min-height: 100vh;
+        }
+
+        .app-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 30px 0;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-title {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-title h1 {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .header-title p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .header-icon {
+            font-size: 56px;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        /* BUTTONS */
+        button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-sm {
+            padding: 8px 12px;
+            font-size: 12px;
+        }
+
+        .btn-icon {
+            padding: 10px;
+            width: 40px;
+            height: 40px;
+        }
+
+        .btn-text {
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            padding: 8px 12px;
+        }
+
+        .btn-text:hover {
+            background: var(--bg-secondary);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        /* MAIN CONTENT */
+        .content-wrapper {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            transition: background 0.3s;
+        }
+
+        /* STATS BAR */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            padding: 24px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            transition: background 0.3s;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+            color: white;
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* TABS & FILTERS */
+        .toolbar {
+            padding: 20px 24px;
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px 12px;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .search-box input {
+            background: transparent;
+            border: none;
+            outline: none;
+            flex: 1;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .search-box input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 8px;
+        }
+
+        .filter-btn {
+            padding: 8px 14px;
+            border-radius: 6px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .filter-btn:hover {
+            border-color: var(--primary);
+        }
+
+        /* FORM SECTION */
+        .form-section {
+            padding: 32px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .form-section h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-primary);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .form-buttons button {
+            flex: 1;
+        }
+
+        /* NOVELS SECTION */
+        .novels-section {
+            padding: 32px 24px;
+        }
+
+        .novels-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .novels-header h2 {
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-primary);
+        }
+
+        .novels-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .novel-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .novel-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+            border-color: var(--primary);
+        }
+
+        .novel-cover {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .novel-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .novel-cover-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .novel-status {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: var(--success);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .novel-status.paused {
+            background: var(--warning);
+        }
+
+        .novel-status.dropped {
+            background: var(--danger);
+        }
+
+        .novel-status.completed {
+            background: var(--info);
+        }
+
+        .novel-content {
+            padding: 16px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .novel-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .novel-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .novel-rating {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 10px;
+        }
+
+        .star {
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #d1d5db;
+        }
+
+        .star.active {
+            color: var(--warning);
+        }
+
+        .star:hover {
+            color: var(--warning);
+            transform: scale(1.2);
+        }
+
+        .progress-section {
+            margin-bottom: 12px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--bg-secondary);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 6px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+            transition: width 0.3s;
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .chapter-controls {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .chapter-controls button {
+            flex: 0 0 32px;
+            padding: 6px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .chapter-controls input {
+            flex: 1;
+            padding: 6px 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 12px;
+        }
+
+        .card-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .card-actions button {
+            padding: 8px;
+            font-size: 12px;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal h3 {
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            margin-bottom: 16px;
+            color: var(--text-secondary);
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 20px;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+            transition: all 0.3s;
+            z-index: 100;
+        }
+
+        .fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 40px rgba(99, 102, 241, 0.5);
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .header-icon {
+                font-size: 40px;
+            }
+
+            .header-title h1 {
+                font-size: 28px;
+            }
+
+            .novels-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 12px;
+            }
+
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                min-width: unset;
+            }
+
+            .filter-tabs {
+                width: 100%;
+                overflow-x: auto;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .fab {
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        function NovelTrackerPro() {
+            const [novels, setNovels] = useState([]);
+            const [darkMode, setDarkMode] = useState(false);
+            const [showAddModal, setShowAddModal] = useState(false);
+            const [editingId, setEditingId] = useState(null);
+            const [filterStatus, setFilterStatus] = useState('all');
+            const [searchQuery, setSearchQuery] = useState('');
+            const [sortBy, setSortBy] = useState('recent');
+
+            const [formData, setFormData] = useState({
+                title: '',
+                totalChapters: '',
+                currentChapter: '',
+                imageUrl: '',
+                status: 'reading',
+                rating: 0,
+                notes: ''
+            });
+
+            useEffect(() => {
+                const saved = localStorage.getItem('novels-pro');
+                if (saved) setNovels(JSON.parse(saved));
+                
+                const savedDarkMode = localStorage.getItem('darkMode');
+                if (savedDarkMode) setDarkMode(JSON.parse(savedDarkMode));
+            }, []);
+
+            useEffect(() => {
+                localStorage.setItem('novels-pro', JSON.stringify(novels));
+            }, [novels]);
+
+            useEffect(() => {
+                localStorage.setItem('darkMode', JSON.stringify(darkMode));
+                if (darkMode) {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                } else {
+                    document.documentElement.removeAttribute('data-theme');
+                }
+            }, [darkMode]);
+
+            const resetForm = () => {
+                setFormData({
+                    title: '',
+                    totalChapters: '',
+                    currentChapter: '',
+                    imageUrl: '',
+                    status: 'reading',
+                    rating: 0,
+                    notes: ''
+                });
+                setEditingId(null);
+            };
+
+            const handleSaveNovel = (e) => {
+                e.preventDefault();
+                if (formData.title && formData.totalChapters) {
+                    if (editingId) {
+                        setNovels(novels.map(n =>
+                            n.id === editingId ? { ...n, ...formData, totalChapters: parseInt(formData.totalChapters), currentChapter: parseInt(formData.currentChapter) || 0 } : n
+                        ));
+                    } else {
+                        const newNovel = {
+                            id: Date.now(),
+                            ...formData,
+                            totalChapters: parseInt(formData.totalChapters),
+                            currentChapter: parseInt(formData.currentChapter) || 0,
+                            dateAdded: new Date().toISOString()
+                        };
+                        setNovels([newNovel, ...novels]);
+                    }
+                    setShowAddModal(false);
+                    resetForm();
+                }
+            };
+
+            const deleteNovel = (id) => {
+                if (confirm('Are you sure you want to delete this novel?')) {
+                    setNovels(novels.filter(n => n.id !== id));
+                }
+            };
+
+            const updateProgress = (id, newChapter) => {
+                setNovels(novels.map(n =>
+                    n.id === id ? { ...n, currentChapter: Math.min(newChapter, n.totalChapters) } : n
+                ));
+            };
+
+            const updateRating = (id, rating) => {
+                setNovels(novels.map(n =>
+                    n.id === id ? { ...n, rating } : n
+                ));
+            };
+
+            const updateStatus = (id, status) => {
+                setNovels(novels.map(n =>
+                    n.id === id ? { ...n, status } : n
+                ));
+            };
+
+            const editNovel = (novel) => {
+                setFormData({
+                    title: novel.title,
+                    totalChapters: novel.totalChapters.toString(),
+                    currentChapter: novel.currentChapter.toString(),
+                    imageUrl: novel.imageUrl,
+                    status: novel.status,
+                    rating: novel.rating || 0,
+                    notes: novel.notes || ''
+                });
+                setEditingId(novel.id);
+                setShowAddModal(true);
+            };
+
+            const exportData = () => {
+                const dataStr = JSON.stringify(novels, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `novel-tracker-backup-${new Date().toISOString().split('T')[0]}.json`;
+                link.click();
+            };
+
+            const importData = (e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        try {
+                            const imported = JSON.parse(event.target.result);
+                            setNovels([...novels, ...imported]);
+                            alert('Data imported successfully!');
+                        } catch {
+                            alert('Error importing file');
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+
+            const getProgress = (current, total) => {
+                return total > 0 ? Math.round((current / total) * 100) : 0;
+            };
+
+            let filtered = novels.filter(n => {
+                const matchStatus = filterStatus === 'all' || n.status === filterStatus;
+                const matchSearch = n.title.toLowerCase().includes(searchQuery.toLowerCase());
+                return matchStatus && matchSearch;
+            });
+
+            if (sortBy === 'progress') {
+                filtered.sort((a, b) => getProgress(b.currentChapter, b.totalChapters) - getProgress(a.currentChapter, a.totalChapters));
+            } else if (sortBy === 'title') {
+                filtered.sort((a, b) => a.title.localeCompare(b.title));
+            }
+
+            const totalChaptersRead = novels.reduce((sum, n) => sum + n.currentChapter, 0);
+            const completedNovels = novels.filter(n => n.status === 'completed').length;
+            const avgRating = novels.length > 0 ? (novels.reduce((sum, n) => sum + (n.rating || 0), 0) / novels.length).toFixed(1) : 0;
+
+            return (
+                <div className="app-container">
+                    <div className="header">
+                        <div className="header-left">
+                            <div className="header-icon">
+                                <i className="ti ti-book-2"></i>
+                            </div>
+                            <div className="header-title">
+                                <h1>Novel Tracker Pro</h1>
+                                <p>Advanced reading progress tracker</p>
+                            </div>
+                        </div>
+                        <div className="header-controls">
+                            <button 
+                                className="btn-secondary btn-icon"
+                                onClick={() => setDarkMode(!darkMode)}
+                                title={darkMode ? 'Light mode' : 'Dark mode'}
+                            >
+                                <i className={`ti ${darkMode ? 'ti-sun' : 'ti-moon'}`}></i>
+                            </button>
+                            <button className="btn-secondary btn-sm" onClick={exportData}>
+                                <i className="ti ti-download"></i>
+                                Export
+                            </button>
+                            <label className="btn-secondary btn-sm" style={{ cursor: 'pointer' }}>
+                                <i className="ti ti-upload"></i>
+                                Import
+                                <input type="file" accept=".json" onChange={importData} style={{ display: 'none' }} />
+                            </label>
+                        </div>
+                    </div>
+
+                    <div className="content-wrapper">
+                        {novels.length > 0 && (
+                            <div className="stats-bar">
+                                <div className="stat-card">
+                                    <div className="stat-number">{novels.length}</div>
+                                    <div className="stat-label">Total Novels</div>
+                                </div>
+                                <div className="stat-card">
+                                    <div className="stat-number">{totalChaptersRead}</div>
+                                    <div className="stat-label">Chapters Read</div>
+                                </div>
+                                <div className="stat-card">
+                                    <div className="stat-number">{completedNovels}</div>
+                                    <div className="stat-label">Completed</div>
+                                </div>
+                                <div className="stat-card">
+                                    <div className="stat-number">{avgRating}</div>
+                                    <div className="stat-label">Avg Rating</div>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="form-section">
+                            <h2>
+                                <i className="ti ti-plus"></i>
+                                {editingId ? 'Edit Novel' : 'Add New Novel'}
+                            </h2>
+                            <form onSubmit={handleSaveNovel}>
+                                <div className="form-grid">
+                                    <div className="form-group">
+                                        <label>Title *</label>
+                                        <input
+                                            type="text"
+                                            placeholder="e.g., Martial World"
+                                            value={formData.title}
+                                            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                                            required
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Total Chapters *</label>
+                                        <input
+                                            type="number"
+                                            placeholder="e.g., 1500"
+                                            value={formData.totalChapters}
+                                            onChange={(e) => setFormData({ ...formData, totalChapters: e.target.value })}
+                                            required
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Current Chapter</label>
+                                        <input
+                                            type="number"
+                                            placeholder="e.g., 50"
+                                            value={formData.currentChapter}
+                                            onChange={(e) => setFormData({ ...formData, currentChapter: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Status</label>
+                                        <select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })}>
+                                            <option value="reading">Reading</option>
+                                            <option value="paused">Paused</option>
+                                            <option value="completed">Completed</option>
+                                            <option value="dropped">Dropped</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div className="form-grid">
+                                    <div className="form-group">
+                                        <label>Cover Image URL</label>
+                                        <input
+                                            type="text"
+                                            placeholder="https://example.com/cover.jpg"
+                                            value={formData.imageUrl}
+                                            onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Rating</label>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            max="5"
+                                            step="0.5"
+                                            placeholder="e.g., 4.5"
+                                            value={formData.rating}
+                                            onChange={(e) => setFormData({ ...formData, rating: parseFloat(e.target.value) || 0 })}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="form-group">
+                                    <label>Notes</label>
+                                    <textarea
+                                        placeholder="Add your thoughts about this novel..."
+                                        value={formData.notes}
+                                        onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                                    ></textarea>
+                                </div>
+                                <div className="form-buttons">
+                                    <button type="submit" className="btn-primary">
+                                        <i className="ti ti-check"></i>
+                                        {editingId ? 'Update Novel' : 'Add Novel'}
+                                    </button>
+                                    {editingId && (
+                                        <button type="button" className="btn-secondary" onClick={() => { setShowAddModal(false); resetForm(); }}>
+                                            Cancel
+                                        </button>
+                                    )}
+                                </div>
+                            </form>
+                        </div>
+
+                        {novels.length > 0 && (
+                            <div className="toolbar">
+                                <div className="search-box">
+                                    <i className="ti ti-search"></i>
+                                    <input
+                                        type="text"
+                                        placeholder="Search novels..."
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                    />
+                                </div>
+                                <div className="filter-group">
+                                    <div className="filter-tabs">
+                                        {['all', 'reading', 'paused', 'completed', 'dropped'].map(status => (
+                                            <button
+                                                key={status}
+                                                className={`filter-btn ${filterStatus === status ? 'active' : ''}`}
+                                                onClick={() => setFilterStatus(status)}
+                                            >
+                                                {status.charAt(0).toUpperCase() + status.slice(1)}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="filter-btn">
+                                        <option value="recent">Recent</option>
+                                        <option value="progress">Progress</option>
+                                        <option value="title">Title A-Z</option>
+                                    </select>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="novels-section">
+                            {filtered.length === 0 ? (
+                                <div className="empty-state">
+                                    <i className="ti ti-inbox"></i>
+                                    <h3>No novels found</h3>
+                                    <p>{novels.length === 0 ? 'Add your first novel to get started!' : 'No novels match your filters.'}</p>
+                                </div>
+                            ) : (
+                                <>
+                                    <div className="novels-header">
+                                        <h2>
+                                            <i className="ti ti-bookmarks"></i>
+                                            Your Novels ({filtered.length})
+                                        </h2>
+                                    </div>
+                                    <div className="novels-grid">
+                                        {filtered.map(novel => {
+                                            const progress = getProgress(novel.currentChapter, novel.totalChapters);
+                                            return (
+                                                <div key={novel.id} className="novel-card">
+                                                    <div className="novel-cover">
+                                                        {novel.imageUrl ? (
+                                                            <img src={novel.imageUrl} alt={novel.title} onError={(e) => e.target.style.display = 'none'} />
+                                                        ) : (
+                                                            <div className="novel-cover-placeholder">
+                                                                <i className="ti ti-photo" style={{ fontSize: '32px', marginBottom: '8px' }}></i>
+                                                                <div>No Cover</div>
+                                                            </div>
+                                                        )}
+                                                        <div className={`novel-status ${novel.status}`}>
+                                                            {novel.status}
+                                                        </div>
+                                                    </div>
+                                                    <div className="novel-content">
+                                                        <div className="novel-title">{novel.title}</div>
+
+                                                        <div className="novel-rating">
+                                                            {[1, 2, 3, 4, 5].map(star => (
+                                                                <span
+                                                                    key={star}
+                                                                    className={`star ${star <= novel.rating ? 'active' : ''}`}
+                                                                    onClick={() => updateRating(novel.id, star)}
+                                                                >
+                                                                    ★
+                                                                </span>
+                                                            ))}
+                                                        </div>
+
+                                                        <div className="novel-meta">
+                                                            <span><i className="ti ti-bookmark"></i> {novel.currentChapter}/{novel.totalChapters}</span>
+                                                            <span>{progress}%</span>
+                                                        </div>
+
+                                                        <div className="progress-section">
+                                                            <div className="progress-bar">
+                                                                <div className="progress-fill" style={{ width: `${progress}%` }}></div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="chapter-controls">
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => updateProgress(novel.id, Math.max(0, novel.currentChapter - 1))}
+                                                            >
+                                                                <i className="ti ti-minus"></i>
+                                                            </button>
+                                                            <input
+                                                                type="number"
+                                                                min="0"
+                                                                max={novel.totalChapters}
+                                                                value={novel.currentChapter}
+                                                                onChange={(e) => updateProgress(novel.id, parseInt(e.target.value) || 0)}
+                                                            />
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => updateProgress(novel.id, Math.min(novel.totalChapters, novel.currentChapter + 1))}
+                                                            >
+                                                                <i className="ti ti-plus"></i>
+                                                            </button>
+                                                        </div>
+
+                                                        <div className="card-actions">
+                                                            <button
+                                                                type="button"
+                                                                className="btn-text"
+                                                                onClick={() => editNovel(novel)}
+                                                            >
+                                                                <i className="ti ti-edit"></i> Edit
+                                                            </button>
+                                                            <button
+                                                                type="button"
+                                                                className="btn-text"
+                                                                onClick={() => deleteNovel(novel.id)}
+                                                                style={{ color: 'var(--danger)' }}
+                                                            >
+                                                                <i className="ti ti-trash"></i> Delete
+                                                            </button>
+                                                        </div>
+
+                                                        {novel.notes && (
+                                                            <div style={{ marginTop: '12px', padding: '8px', background: 'var(--bg-secondary)', borderRadius: '6px', fontSize: '12px', color: 'var(--text-secondary)' }}>
+                                                                <i className="ti ti-note"></i> {novel.notes}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    </div>
+
+                    <button className="fab" onClick={() => setShowAddModal(true)} title="Add novel">
+                        <i className="ti ti-plus"></i>
+                    </button>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<NovelTrackerPro />, document.getElementById('root'));
+    </script>
+</body>
+</html>
